@@ -1,78 +1,23 @@
-name: Laravel Build and Deploy
+name: Deploy Gradestar to Production
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main # Triggers the deployment whenever code is merged to main
 
-# --- MANDATORY FOR OIDC ---
 permissions:
-  id-token: write # Required for requesting the JWT from GitHub
-  contents: read  # Required for actions/checkout
+  id-token: write # Required for secure Azure OpenID Connect (OIDC) authentication
+  contents: read
 
 jobs:
-  # --- JOB 1: BUILD ---
-  build_app:
-    runs-on: ubuntu-latest
+  build-and-deploy:
+    runs-on: ubuntu-latest 
     steps:
-      - uses: actions/checkout@v4
+      # 1. Pull down the source code
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, bcmath, gd, zip # Ensure standard Laravel extensions
-
-      - name: Install Composer Dependencies
-        run: composer install --no-dev --optimize-autoloader
-
-      - name: Install NPM & Build Vite
-        run: |
-          npm install
-          npm run build
-
-      - name: Create Deployment Zip
-        run: zip -r release.zip . -x "*.git*" "node_modules/*" "tests/*" "storage/framework/cache/[^.]*" "storage/framework/sessions/[^.]*" "storage/framework/views/[^.]*" "storage/logs/[^.]*"
-
-      - name: Archive Production Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: laravel-app-zip
-          path: release.zip
-          include-hidden-files: true
-
-  # --- JOB 2: DEPLOY TO STAGING ---
-  deploy_staging:
-    needs: build_app
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: laravel-app-zip
-          path: .
-
-      # --- UPDATED FOR OIDC ---
-      - name: Azure Login
-        uses: azure/login@v2 # Updated to v2 for better OIDC support
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Deploy to Staging Slot 
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'laravel-webapp-elora'
-          slot-name: 'laravel-app-staging'
-          package: release.zip
-
-  # --- JOB 3: SWAP TO PRODUCTION (Approval Required) --- 
-  promote_to_production:
-    needs: deploy_staging
-    runs-on: ubuntu-latest
-    environment: 'Production' # Triggers environment protection rules in GitHub
-    steps:
-      # --- UPDATED FOR OIDC ---
+      # 2. Authenticate with Azure securely using OIDC (No long-lived passwords!)
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -80,18 +25,31 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Swap Slots
-        run: |
-          az webapp deployment slot swap \
-            --resource-group app-service-rg \
-            --name laravel-webapp-elora \
-            --slot laravel-app-staging \
-            --target-slot production
+      # 3. Log into your private Azure Container Registry
+      - name: Log in to Azure Container Registry
+        run: az acr login --name acrgradestarprod
 
-      # -- RUN MIGRATIONS AFTER SWAP ---
-      # - name: Run Production Migrations
-      #   run: |
-      #     az webapp ssh \
-      #       --resource-group app-service-rg \
-      #       --name laravel-webapp-elora \
-      #       --command "php artisan migrate --force"
+      # 4. Build and Push the Production Containers
+      # This triggers your multi-stage Dockerfile, handling Node/Vite automatically!
+      - name: Build and Push Docker Images
+        run: |
+          docker build -t acrgradestarprod.azurecr.io/gradestar-app:${{ github.sha }} .
+          docker build -t acrgradestarprod.azurecr.io/gradestar-app:latest .
+          
+          docker push acrgradestarprod.azurecr.io/gradestar-app:${{ github.sha }}
+          docker push acrgradestarprod.azurecr.io/gradestar-app:latest
+
+      # 5. Connect to your AKS Cluster context
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: 'app-service-rg'
+          cluster-name: 'aks-gradestar-prod'
+
+      # 6. Apply Kubernetes manifests to pull the new code
+      - name: Deploy Workload to AKS
+        run: |
+          # Substitute the unique commit SHA into our deployment manifest
+          sed -i "s|acrgradestarprod.azurecr.io/gradestar-app:latest|acrgradestarprod.azurecr.io/gradestar-app:${{ github.sha }}|g" k8s/deployment.yml
+          
+          kubectl apply -f k8s/deployment.yml
