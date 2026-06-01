@@ -43,7 +43,7 @@ spec:
           envFrom:
             # Inject all plain-text configurations directly from the ConfigMap
             - configMapRef:
-                name: gradestar-config:
+                name: gradestar-config
 
           env:
             - name: DB_PASSWORD
