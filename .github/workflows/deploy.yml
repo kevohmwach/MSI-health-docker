@@ -68,7 +68,7 @@ jobs:
           helm upgrade --install cert-manager jetstack/cert-manager \
             --namespace cert-manager \
             --create-namespace \
-            --set installCRDs=true
+            --set installCRDs=true 
 
       # 7. Apply Kubernetes manifests to pull the new code
       - name: Deploy Workload to AKS
