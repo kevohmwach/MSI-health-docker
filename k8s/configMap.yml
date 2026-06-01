@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gradestar-config
+  namespace: default
+data:
+  # Structural configuration parameters stored in plain text
+  APP_ENV: "production"
+  APP_URL: "https://cloud.gradestarsolutions.com"
+  DB_HOST: "gradestar-prod.mysql.database.azure.com"
+  DB_USERNAME: "gradestar_admin"
+  # Asset Storage Routing
+  # Format: https://[storage-account-name].blob.core.windows.net/[container-name]
+  ASSET_URL: "https://sagradestarprodassets.blob.core.windows.net/user-uploads"

@@ -39,12 +39,24 @@ spec:
           ports:
             - containerPort: 9000
               name: fastcgi
+
+          envFrom:
+            # Inject all plain-text configurations directly from the ConfigMap
+            - configMapRef:
+                name: gradestar-config:
+
           env:
-            - name: APP_ENV
-              value: "production"
-            - name: DB_HOST
-              value: "db-gradestar-prod.mysql.database.azure.com" # Your Azure DB address
-            # We will use Kubernetes Secrets later to securely inject sensitive keys
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gradestar-secrets    # Name of the secret file object
+                  key: database-password     # The specific key inside that object
+
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gradestar-secrets
+                  key: app-key
           resources:
             requests:
               cpu: "200m"

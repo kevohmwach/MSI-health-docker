@@ -43,13 +43,48 @@ jobs:
       - name: Set AKS Context
         uses: azure/aks-set-context@v4
         with:
-          resource-group: 'app-service-rg'
+          resource-group: 'rg-aks-laravel-prod'
           cluster-name: 'aks-gradestar-prod'
 
-      # 6. Apply Kubernetes manifests to pull the new code
+      # 6. Install Helm and Cluster Routing/Security Infrastructure
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.14.0'
+
+      - name: Deploy Ingress and Cert-Manager Controllers
+        run: |
+          # Add necessary Helm charts repositories
+          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+          helm repo add jetstack https://charts.jetstack.io
+          helm repo update
+          
+          # 1. Install Nginx Ingress Controller
+          helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+            --namespace default \
+            --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"="rg-aks-laravel-prod"
+
+          # 2. Install Cert-Manager (with Custom Resource Definitions enabled)
+          helm upgrade --install cert-manager jetstack/cert-manager \
+            --namespace cert-manager \
+            --create-namespace \
+            --set installCRDs=true
+
+      # 7. Apply Kubernetes manifests to pull the new code
       - name: Deploy Workload to AKS
         run: |
-          # Substitute the unique commit SHA into our deployment manifest
+          # Apply secrets & configmap first so they are available to the pods
+          kubectl apply -f k8s/secrets.yml
+          kubectl apply -f k8s/configMap.yml
+
+          # Wait a few seconds for Cert-Manager to completely wake up before issuing certs
+          sleep 20 
+          kubectl apply -f k8s/certIssuer.yml
+
+          # Substitute the unique commit SHA into deployment manifest
           sed -i "s|acrgradestarprod.azurecr.io/gradestar-app:latest|acrgradestarprod.azurecr.io/gradestar-app:${{ github.sha }}|g" k8s/deployment.yml
           
           kubectl apply -f k8s/deployment.yml
+
+          # Deploy routing rules
+          kubectl apply -f k8s/ingress.yml
