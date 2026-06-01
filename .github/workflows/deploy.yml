@@ -6,7 +6,7 @@ on:
       - main # Triggers the deployment whenever code is merged to main
 
 permissions:
-  id-token: write # Required for secure Azure OpenID Connect (OIDC) authentication
+  id-token: write # Required for secure Azure OpenID Connect (OIDC) authentication 
   contents: read
 
 jobs:
