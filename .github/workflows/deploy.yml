@@ -44,7 +44,7 @@ jobs:
         uses: azure/aks-set-context@v4
         with:
           resource-group: 'rg-aks-laravel-prod'
-          cluster-name: 'aks-gradestar-prod'
+          cluster-name: 'gradestar-aks-cluster'
 
       # 6. Install Helm and Cluster Routing/Security Infrastructure
       - name: Install Helm
