@@ -86,8 +86,8 @@ jobs:
           
           kubectl apply -f k8s/deployment.yml
 
-          # # Deploy routing rules
-          # kubectl apply -f k8s/ingress.yml
+          # Deploy routing rules
+          kubectl apply -f k8s/ingress.yml
 
 
           # # 1. Tear down the routing object
