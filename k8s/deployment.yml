@@ -72,3 +72,18 @@ spec:
       volumes:
         - name: shared-assets
           emptyDir: {}
+
+--
+apiVersion: v1
+kind: Service
+metadata:
+  name: gradestar-app-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 9000 # Change this to 8000, 9000, etc., if your container runs on a different port
+      protocol: TCP
+  selector:
+    app: gradestar# ⚠️ This MUST match the exact label in your Deployment's spec.template.metadata.labels
