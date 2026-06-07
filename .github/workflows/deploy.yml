@@ -39,6 +39,12 @@ jobs:
           docker push acrgradestarprod.azurecr.io/gradestar-app:${{ github.sha }}
           docker push acrgradestarprod.azurecr.io/gradestar-app:latest
 
+          # Build and push the Nginx Web Proxy Image
+          docker build -t acrgradestarprod.azurecr.io/gradestar-web:${{ github.sha }} -f docker/nginx/Dockerfile .
+          docker build -t acrgradestarprod.azurecr.io/gradestar-web:latest -f docker/nginx/Dockerfile .
+          docker push acrgradestarprod.azurecr.io/gradestar-web:${{ github.sha }}
+          docker push acrgradestarprod.azurecr.io/gradestar-web:latest
+
       # 5. Connect to your AKS Cluster context
       - name: Set AKS Context
         uses: azure/aks-set-context@v4

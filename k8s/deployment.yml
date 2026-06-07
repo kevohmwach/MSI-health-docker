@@ -83,7 +83,7 @@ spec:
   type: ClusterIP
   ports:
     - port: 80
-      targetPort: 9000 # Change this to 8000, 9000, etc., if your container runs on a different port
+      targetPort: 80 # NGINX Port
       protocol: TCP
   selector:
-    app: gradestar # ⚠️ This MUST match the exact label in your Deployment's spec.template.metadata.labels
+    app: gradestar
