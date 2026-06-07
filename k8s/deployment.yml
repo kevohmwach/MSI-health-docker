@@ -86,4 +86,4 @@ spec:
       targetPort: 9000 # Change this to 8000, 9000, etc., if your container runs on a different port
       protocol: TCP
   selector:
-    app: gradestar# ⚠️ This MUST match the exact label in your Deployment's spec.template.metadata.labels
+    app: gradestar # ⚠️ This MUST match the exact label in your Deployment's spec.template.metadata.labels
