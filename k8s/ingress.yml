@@ -5,6 +5,9 @@ metadata:
   name: gradestar-ingress
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    # 🚀 CRUCIAL: Allows Cert-Manager HTTP-01 challenges to pass without being forced into an unencrypted/stuck SSL loop
+    nginx.ingress.kubernetes.io/acme-challenge-type: "http01"
+    
     # === Cert-Manager Automation Activation ===
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     # SRE Optimization for Cloudflare
