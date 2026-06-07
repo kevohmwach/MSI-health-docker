@@ -90,11 +90,11 @@ jobs:
           # kubectl apply -f k8s/ingress.yml
 
 
-          # 1. Tear down the routing object
-          kubectl delete -f k8s/ingress.yml
+          # # 1. Tear down the routing object
+          # kubectl delete -f k8s/ingress.yml
 
-          # # 2. Wait 5 seconds for the controller hooks to clear
-          # sleep 10
+          # # # 2. Wait 5 seconds for the controller hooks to clear
+          # # sleep 10
 
-          # # 3. Bring it back up clean
-          # kubectl apply -f k8s/ingress.yml
+          # # # 3. Bring it back up clean
+          # # kubectl apply -f k8s/ingress.yml
