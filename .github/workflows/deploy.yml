@@ -52,7 +52,7 @@ jobs:
         with:
           version: 'v3.14.0'
 
-      - name: Deploy Ingress and Cert-Manager Controllers 
+      - name: Deploy Ingress and Cert-Manager Controllers
         run: |
           # Add necessary Helm charts repositories
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
