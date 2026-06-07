@@ -86,7 +86,7 @@ jobs:
           
           kubectl apply -f k8s/deployment.yml
 
-          # Deploy routing rules
+          # Deploy routing rules 
           kubectl apply -f k8s/ingress.yml
 
 
