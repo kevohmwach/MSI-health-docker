@@ -70,7 +70,7 @@ jobs:
             --create-namespace \
             --set installCRDs=true 
 
-      # 7. Apply Kubernetes manifests to pull the new code
+      # 7. Apply Kubernetes manifests to pull the new code 
       - name: Deploy Workload to AKS
         run: |
           # Apply secrets & configmap first so they are available to the pods
@@ -86,5 +86,15 @@ jobs:
           
           kubectl apply -f k8s/deployment.yml
 
-          # Deploy routing rules
+          # # Deploy routing rules
+          # kubectl apply -f k8s/ingress.yml
+
+
+          # 1. Tear down the routing object
+          kubectl delete -f k8s/ingress.yml
+
+          # 2. Wait 5 seconds for the controller hooks to clear
+          sleep 10
+
+          # 3. Bring it back up clean
           kubectl apply -f k8s/ingress.yml
