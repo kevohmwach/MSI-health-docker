@@ -6,7 +6,7 @@ metadata:
   labels:
     app: gradestar
 spec:
-  replicas: 2 # Standard high-availability setup (2 separate nodes running the app) 
+  replicas: 1 # Standard high-availability setup (2 separate nodes running the app) 
   selector:
     matchLabels:
       app: gradestar
