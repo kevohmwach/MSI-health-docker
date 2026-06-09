@@ -68,7 +68,7 @@ jobs:
           # 1. Install Nginx Ingress Controller
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace default \
-            --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"="rg-aks-laravel-prod"
+            --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=""
 
           # 2. Install Cert-Manager (with Custom Resource Definitions enabled)
           helm upgrade --install cert-manager jetstack/cert-manager \
