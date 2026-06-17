@@ -47,6 +47,13 @@ spec:
           volumeMounts:
             - name: shared-assets
               mountPath: /var/www
+              
+          # readinessProbe:
+          #   httpGet:
+          #     path: /index.php       # Nginx will try to serve index.php
+          #     port: 80
+          #   initialDelaySeconds: 5   # Give the initContainer and Nginx 5 seconds to settle
+          #   periodSeconds: 10        # Check every 10 seconds
 
         # === Container 2: The PHP-FPM Application Server ===
         - name: php
@@ -80,6 +87,12 @@ spec:
           volumeMounts:
             - name: shared-assets
               mountPath: /var/www
+
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: 9000             # Make sure the FastCGI port is wide open and responding
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 20
 
       # Shared volume across the Pod context
       volumes:
