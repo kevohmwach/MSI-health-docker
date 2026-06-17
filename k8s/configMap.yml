@@ -16,4 +16,4 @@ data:
   # Format: https://[storage-account-name].blob.core.windows.net/[container-name]
   # ASSET_URL: "https://sagradestarprodassets.blob.core.windows.net/user-uploads"
   ASSET_URL: "https://cloud.gradestarsolutions.com"
-  MYSQL_ATTR_SSL_CA: "/var/www/certs/DigiCertGlobalRootG2.crt-pem"
+  MYSQL_ATTR_SSL_CA: "/var/www/certs/DigiCertGlobalRootG2.crt.pem"
