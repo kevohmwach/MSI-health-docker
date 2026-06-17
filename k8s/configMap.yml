@@ -7,8 +7,13 @@ data:
   # Structural configuration parameters stored in plain text
   APP_ENV: "production"
   APP_URL: "https://cloud.gradestarsolutions.com"
-  DB_HOST: "gradestar-prod.mysql.database.azure.com"
+  DB_CONNECTION: "mysql"
+  DB_PORT: "3306"
+  DB_HOST: "db-gradestar-prod.mysql.database.azure.com"
+  DB_DATABASE: "gradestar_production" 
   DB_USERNAME: "gradestar_admin"
   # Asset Storage Routing
   # Format: https://[storage-account-name].blob.core.windows.net/[container-name]
-  ASSET_URL: "https://sagradestarprodassets.blob.core.windows.net/user-uploads"
+  # ASSET_URL: "https://sagradestarprodassets.blob.core.windows.net/user-uploads"
+  ASSET_URL: "https://cloud.gradestarsolutions.com"
+  MYSQL_ATTR_SSL_CA: "/var/www/certs/DigiCertGlobalRootG2.crt-pem"

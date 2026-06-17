@@ -45,16 +45,17 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
-            'read' => [
-                'host' => [
-                    env('DB_HOST', 'elara-replica.mysql.database.azure.com'),
-                ],
-            ],
-            'write' => [
-                'host' => [
-                    env('DB_HOST', 'elara-primary.mysql.database.azure.com'),
-                ],
-            ],
+            'host' => env('DB_HOST', 'db-gradestar-prod.mysql.database.azure.com'),
+            // 'read' => [
+            //     'host' => [
+            //         env('DB_HOST', 'elara-replica.mysql.database.azure.com'),
+            //     ],
+            // ],
+            // 'write' => [
+            //     'host' => [
+            //         env('DB_HOST', 'elara-primary.mysql.database.azure.com'),
+            //     ],
+            // ],
             'sticky'    => true, // CRITICAL SRE SETTING
 
             'url' => env('DATABASE_URL'),
