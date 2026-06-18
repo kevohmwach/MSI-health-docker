@@ -70,8 +70,8 @@ jobs:
             --namespace default \
             --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-protocol=TCP' \
             --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-port=80' \
-            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path=""' \
-            --reuse-values
+            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path=""' 
+            # --reuse-values
 
           # 2. Install Cert-Manager (with Custom Resource Definitions enabled)
           helm upgrade --install cert-manager jetstack/cert-manager \
