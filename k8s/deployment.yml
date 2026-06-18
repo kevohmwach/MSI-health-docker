@@ -50,7 +50,7 @@ spec:
 
           # Mount 2: The persistent overlay strictly targeting user uploads
             - name: persistent-uploads
-              mountPath: /var/www/storage/app/public
+              mountPath: /var/www/storage/app
 
           # readinessProbe:
           #   httpGet:
@@ -94,7 +94,7 @@ spec:
 
           # Mount 2: The persistent overlay strictly targeting user uploads
             - name: persistent-uploads
-              mountPath: /var/www/storage/app/public
+              mountPath: /var/www/storage/app
 
           # livenessProbe:
           #   tcpSocket:

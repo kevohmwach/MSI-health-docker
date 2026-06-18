@@ -106,7 +106,7 @@
                     <td>{{$patient['mobile_contact']}}</td>
                     <td>
                         <a class="link" href="{{route('updatePatient', ['id'=>$patient['id'] ] )}}" >Update</a>
-                        {{-- <a href="{{route('showCancer', ['id'=>$patient['id'] ] )}}" >View</a> --}}
+                        <a href="{{route('showCancer', ['id'=>$patient['id'] ] )}}" >View</a>
                     </td>
 
                 </tr>
