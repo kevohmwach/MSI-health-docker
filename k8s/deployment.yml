@@ -47,7 +47,11 @@ spec:
           volumeMounts:
             - name: shared-assets
               mountPath: /var/www
-              
+
+          # Mount 2: The persistent overlay strictly targeting user uploads
+            - name: persistent-uploads
+              mountPath: /var/www/storage/app/public
+
           # readinessProbe:
           #   httpGet:
           #     path: /index.php       # Nginx will try to serve index.php
@@ -88,6 +92,10 @@ spec:
             - name: shared-assets
               mountPath: /var/www
 
+          # Mount 2: The persistent overlay strictly targeting user uploads
+            - name: persistent-uploads
+              mountPath: /var/www/storage/app/public
+
           # livenessProbe:
           #   tcpSocket:
           #     port: 9000             # Make sure the FastCGI port is wide open and responding
@@ -98,6 +106,11 @@ spec:
       volumes:
         - name: shared-assets
           emptyDir: {}
+
+      # Maintains cross-pod access to shared documents
+        - name: persistent-uploads
+          persistentVolumeClaim:
+            claimName: gradestar-storage-pvc
 
 ---
 apiVersion: v1
@@ -113,3 +126,18 @@ spec:
       protocol: TCP
   selector:
     app: gradestar
+
+# # 1. Define the Persistent Volume Claim at the bottom of your file
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: gradestar-storage-pvc
+#   namespace: default
+# spec:
+#   accessModes:
+#     - ReadWriteMany # Allows both PHP and Nginx containers across multiple pods to read/write at the same time
+#   storageClassName: azurefile-csi # Automatically provisions a standard Azure File Share
+#   resources:
+#     requests:
+#       storage: 10Gi

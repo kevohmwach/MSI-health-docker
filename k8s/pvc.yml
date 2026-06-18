@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gradestar-storage-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteMany # Allows both PHP and Nginx containers across multiple pods to read/write at the same time
+  storageClassName: azurefile-csi # Automatically provisions a standard Azure File Share
+  resources:
+    requests:
+      storage: 10Gi

@@ -68,9 +68,10 @@ jobs:
           # 1. Install Nginx Ingress Controller
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace default \
-            --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-protocol"="Tcp" \
+            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-protocol=TCP' \
+            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-port=80' \
+            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path=""' \
             --reuse-values
-            # --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=""
 
           # 2. Install Cert-Manager (with Custom Resource Definitions enabled)
           helm upgrade --install cert-manager jetstack/cert-manager \
@@ -93,6 +94,7 @@ jobs:
           # Substitute the unique commit SHA into deployment manifest
           sed -i "s|acrgradestarprod.azurecr.io/gradestar-app:latest|acrgradestarprod.azurecr.io/gradestar-app:${{ github.sha }}|g" k8s/deployment.yml
           
+          kubectl apply -f k8s/pvc.yml
           kubectl apply -f k8s/deployment.yml
 
           # Deploy routing rules 
