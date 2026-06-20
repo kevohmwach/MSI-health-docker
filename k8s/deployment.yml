@@ -81,6 +81,14 @@ spec:
                 secretKeyRef:
                   name: gradestar-secrets
                   key: app-key
+                  
+            - name: LOG_CHANNEL
+              value: "stderr"
+            - name: LOG_DEPRECATIONS_CHANNEL
+              value: "null"
+            - name: LOG_LEVEL
+              value: "debug"
+
           resources:
             requests:
               cpu: "200m"
