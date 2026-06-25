@@ -64,16 +64,14 @@ jobs:
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
           helm repo add jetstack https://charts.jetstack.io
           helm repo update
-          
+
           # 1. Install Nginx Ingress Controller
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace default \
-            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-protocol=TCP' \
-            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-port=80' \
-            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path=""'
-            
-          # # 🚀 FORCE AZURE TO SWAP TO TCP INSTANTLY BYPASSING HELM QUIRKS
-          # kubectl patch svc ingress-nginx-controller -n default -p '{"metadata":{"annotations":{"service.beta.kubernetes.io/azure-load-balancer-health-probe-protocol":"TCP","service.beta.kubernetes.io/azure-load-balancer-health-probe-port":"80","service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path":""}}}'
+            --set 'controller.service.appProtocol=false' \
+            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-protocol=Tcp' \
+            --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-port=80'
+
 
           # 2. Install Cert-Manager (with Custom Resource Definitions enabled)
           helm upgrade --install cert-manager jetstack/cert-manager \
