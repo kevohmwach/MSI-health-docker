@@ -9,4 +9,4 @@ spec:
   storageClassName: azurefile-csi # Automatically provisions a standard Azure File Share
   resources:
     requests:
-      storage: 10Gi
+      storage: 1Gi
