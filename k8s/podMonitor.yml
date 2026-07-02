@@ -2,7 +2,7 @@ apiVersion: azmonitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: ingress-nginx-podmonitor
-  namespace: ingress-nginx          # namespace where your controller pods run
+  namespace: default          # namespace where your controller pods run
 spec:
   selector:
     matchLabels:

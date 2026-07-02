@@ -101,6 +101,9 @@ jobs:
           # Deploy routing rules 
           kubectl apply -f k8s/ingress.yml
 
+          # Deploy podMonitor (Expose ingress_contoller_metrics) 
+          kubectl apply -f k8s/podMonitor.yml
+
 
           # # 1. Tear down the routing object 
           # kubectl delete -f k8s/ingress.yml
