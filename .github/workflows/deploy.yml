@@ -98,6 +98,8 @@ jobs:
           sed -i "s|acrgradestarprod.azurecr.io/gradestar-app:latest|acrgradestarprod.azurecr.io/gradestar-app:${{ github.sha }}|g" k8s/deployment.yml
           
           kubectl apply -f k8s/pvc.yml
+          kubectl delete -f k8s/deployment.yml
+          sleep 20
           kubectl apply -f k8s/deployment.yml
 
           # Deploy routing rules 
