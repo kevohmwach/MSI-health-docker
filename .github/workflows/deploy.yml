@@ -68,7 +68,7 @@ jobs:
           # 1. Install Nginx Ingress Controller
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace default \
-            --set controller.metrics.enabled=true \ 
+            --set controller.metrics.enabled=true \
             --set controller.podAnnotations."prometheus\.io/scrape"="true" \
             --set controller.podAnnotations."prometheus\.io/port"="10254" \
             --set 'controller.service.appProtocol=false' \
