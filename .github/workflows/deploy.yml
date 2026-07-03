@@ -107,7 +107,7 @@ jobs:
           kubectl apply -f k8s/podMonitor.yml
 
           # Tell Prometheus to scrape custom logs/check ingress annotations 
-          kubectl apply -f ama-metrics-settings-configmap.yaml
+          kubectl apply -f k8s/ama-metrics-settings-configmap.yml
 
 
           # # 1. Tear down the routing object 
