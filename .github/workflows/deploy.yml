@@ -69,7 +69,7 @@ jobs:
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace default \
             --set controller.metrics.enabled=true \
-            --set controller.podAnnotations."prometheus\.io/scrape"="true" \  # Tell azure managed Prometheus to scap custom metrics
+            --set controller.podAnnotations."prometheus\.io/scrape"="true" \
             --set controller.podAnnotations."prometheus\.io/port"="10254" \
             --set 'controller.service.appProtocol=false' \
             --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-protocol=Tcp' \
