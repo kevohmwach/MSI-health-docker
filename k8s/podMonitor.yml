@@ -9,7 +9,7 @@ spec:
       app.kubernetes.io/name: ingress-nginx   # match your actual pod labels
   namespaceSelector:
     matchNames:
-      - ingress-nginx
+      - default
   podMetricsEndpoints:
     - port: metrics                 # the named port exposing /metrics
       path: /metrics
