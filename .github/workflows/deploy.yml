@@ -69,6 +69,8 @@ jobs:
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace default \
             --set controller.metrics.enabled=true \
+            --set controller.podAnnotations."prometheus\.io/scrape"="true" \  # Tell azure managed Prometheus to scap custom metrics
+            --set controller.podAnnotations."prometheus\.io/port"="10254" \
             --set 'controller.service.appProtocol=false' \
             --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-protocol=Tcp' \
             --set 'controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-port=80'
@@ -103,6 +105,9 @@ jobs:
 
           # Deploy podMonitor (Expose ingress_contoller_metrics) 
           kubectl apply -f k8s/podMonitor.yml
+
+          # Tell Prometheus to scrape custom logs/check ingress annotations 
+          kubectl apply -f ama-metrics-settings-configmap.yaml
 
 
           # # 1. Tear down the routing object 
