@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1   # FIX: was azmonitoring.coreos.com/v1 (Azure Managed
+                                        # Prometheus's CRD group). Self-hosted kube-prometheus-stack
+                                        # registers CRDs under monitoring.coreos.com/v1 instead —
+                                        # different operator, different CRD group.
+kind: PodMonitor
+metadata:
+  name: ingress-nginx-podmonitor
+  namespace: default          # namespace where your controller pods run
+  labels:
+    release: monitoring       # FIX: added. kube-prometheus-stack's Prometheus only auto-discovers
+                               # PodMonitors matching its podMonitorSelector, which by default
+                               # requires this label to equal the Helm release name ("monitoring",
+                               # per the `helm upgrade --install monitoring ...` in your workflow).
+                               # Without it, this PodMonitor is applied but silently ignored.
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx   # match your actual pod labels
+  namespaceSelector:
+    matchNames:
+      - default
+  podMetricsEndpoints:
+    - port: metrics                 # the named port exposing /metrics
+      path: /metrics
+      interval: 30s

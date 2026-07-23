@@ -1,0 +1,92 @@
+# Self-hosted Prometheus + Grafana, replacing:
+#   - azurerm_dashboard_grafana (Managed Grafana, ~$31-37/mo + $6/mo/user)
+#   - azurerm_monitor_workspace (Managed Prometheus, billed on ingestion)
+#
+# Install:
+#   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+#   helm repo update
+#   helm install monitoring prometheus-community/kube-prometheus-stack \
+#     -n monitoring --create-namespace \
+#     -f kube-prometheus-stack-values.yaml
+#
+# This runs entirely on the AKS nodes you already pay for — no extra Azure
+# billing meters. The tradeoff vs Managed Grafana/Prometheus: you own
+# upgrades, backup of dashboards/data, and HA — fine for a study/budget
+# project, worth revisiting once this is a real production workload.
+
+# --- Prometheus ---
+prometheus:
+  prometheusSpec:
+    retention: 7d          # keep this short on a budget node pool — retention = disk = cost
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: managed-csi   # default AKS storage class, no extra setup
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+# --- Grafana ---
+grafana:
+  enabled: true
+  adminPassword: "" # leave blank — set via --set on install or a sealed secret, never commit this
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  persistence:
+    enabled: true
+    storageClassName: managed-csi
+    size: 2Gi
+
+  # Reuse the same ingress-nginx + cert-manager setup you already run for
+  # cloud.gradestarsolutions.com instead of paying for a separate Managed
+  # Grafana endpoint.
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.gradestarsolutions.com
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - grafana.gradestarsolutions.com
+
+  # Points Grafana at the Prometheus this same chart deploys — no Managed
+  # Prometheus workspace or ingestion billing involved.
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090
+          access: proxy
+          isDefault: true
+
+# --- Alertmanager: off by default to keep footprint minimal; flip on once
+# you actually want alerts routed somewhere (Slack, email, etc.)
+alertmanager:
+  enabled: false
+
+# --- Skip scraping cluster components that don't matter for a single-app
+# cluster and just add ingestion volume for no benefit
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeEtcd:
+  enabled: false
