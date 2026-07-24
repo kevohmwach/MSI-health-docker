@@ -97,7 +97,7 @@ jobs:
             --create-namespace \
             -f helm/kube-prometheus-stack-values.yaml \
             --set grafana.adminPassword="${{ secrets.GRAFANA_ADMIN_PASSWORD }}" \
-            --wait --timeout 15m
+            --wait --timeout 5m
 
       # 7. Apply Kubernetes manifests to pull the new code
       - name: Deploy Workload to AKS
