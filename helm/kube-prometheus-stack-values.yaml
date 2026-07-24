@@ -41,10 +41,15 @@ grafana:
   resources:
     requests:
       cpu: 100m
-      memory: 128Mi
+      memory: 200Mi
     limits:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 300m
+      memory: 400Mi
+  # FIX: was 128Mi/256Mi — Grafana pod was CrashLoopBackOff-ing on startup
+  # ("Back-off restarting failed container grafana"), consistent with an
+  # OOMKill during datasource provisioning/plugin load. Confirm via:
+  #   kubectl describe pod -n monitoring -l app.kubernetes.io/name=grafana
+  # and check the "Last State: Reason" field — if it says OOMKilled, this is it.
   persistence:
     enabled: true
     storageClassName: managed-csi
@@ -56,6 +61,10 @@ grafana:
   ingress:
     enabled: true
     ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/acme-challenge-type: "http01"
+      nginx.ingress.kubernetes.io/enable-real-ip: "true"
     hosts:
       - grafana.gradestarsolutions.com
     tls:
@@ -63,17 +72,16 @@ grafana:
         hosts:
           - grafana.gradestarsolutions.com
 
-  # Points Grafana at the Prometheus this same chart deploys — no Managed
-  # Prometheus workspace or ingestion billing involved.
-  datasources:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
-        - name: Prometheus
-          type: prometheus
-          url: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090
-          access: proxy
-          isDefault: true
+  # NOTE: no manual `datasources:` block here. kube-prometheus-stack already
+  # auto-provisions a "Prometheus" datasource pointing at its own bundled
+  # Prometheus instance by default (via grafana.sidecar.datasources, enabled
+  # out of the box). An earlier version of this file also defined one
+  # manually with isDefault: true, which collided with the chart's own
+  # auto-generated default and crashed Grafana on startup with:
+  #   "Datasource provisioning error: ... Only one datasource per
+  #    organization can be marked as default"
+  # If you want to confirm it's there once deployed: Grafana UI → Connections
+  # → Data sources, you should see one named "Prometheus" already configured.
 
 # --- Alertmanager: off by default to keep footprint minimal; flip on once
 # you actually want alerts routed somewhere (Slack, email, etc.)
